@@ -6,7 +6,7 @@ Goals
 - Make this work hardware agnostic as possible
 - Push as much as possible through gitlab 
 
-# Multiple compose-docker.<tool>.yml files
+# Multiple compose-docker.\<tool\>.yml files
 Why - Each compose file allows to individually test each (docker-compose -f)
 ### Current Tool List
 - Swarmpit

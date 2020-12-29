@@ -1,0 +1,90 @@
+version: '#.#' # version of docker-compose, 3.8 most recent
+
+services: # specifies the "services, apps running"
+  app: # name of first service running
+    image: swarmpit/swarmpit:latest # image specified, version specified is better than :latest
+    environment: # env variables
+      - SWARMPIT_DB=http://db:5984 # specifies the needed DB = address
+      - SWARMPIT_INFLUXDB=http://influxdb:8086
+    volumes: # specifies volumes
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports: # maps HOST : CONTAINER ports
+      - 888:8080
+    healthcheck:  # Checks health of container
+      test: ["CMD", "curl", "-f", "http://localhost:8080"] # cmd run to check for response
+      interval: 60s # every min
+      timeout: 10s # fails after 10s
+      retries: 3 # number of attempts till failure
+    networks: # specifies network docker images are able to comm on
+      - net # later declared network
+    deploy: # gives specifics on how this service should be deployed
+      resources: # defines hardware sources
+        limits: # limited to (max)
+          cpus: '0.50' # % of a CPU usage
+          memory: 1024M # total mem used
+        reservations: # min resources
+          cpus: '0.25'
+          memory: 512M
+      placement: 
+        constraints: # required how/where ran
+          - node.role == manager # specifics in swarm, must be run on the manager
+
+  db:
+    image: couchdb:2.3.0
+    volumes:
+      - db-data:/opt/couchdb/data  # specifies a (later) specified volume 
+    networks:
+      - net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 256M
+        reservations:
+          cpus: '0.15'
+          memory: 128M
+
+  influxdb:
+    image: influxdb:1.7
+    volumes:
+      - influx-data:/var/lib/influxdb
+    networks:
+      - net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.60'
+          memory: 512M
+        reservations:
+          cpus: '0.30'
+          memory: 128M
+
+  agent:
+    image: swarmpit/agent:latest
+    environment:
+      - DOCKER_API_VERSION=1.35 # Why is this specified?
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - net
+    deploy:
+      mode: global
+      labels:
+        swarmpit.agent: 'true'
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 64M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
+
+networks: # specifies networks in stack
+  net:  # name of specific network 
+    driver: overlay # type of network (driver used)
+
+volumes: # specifies volumes in stack
+  db-data:
+    driver: local # 
+  influx-data:
+    driver: local # 

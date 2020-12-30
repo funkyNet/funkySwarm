@@ -6,10 +6,20 @@ Goals
 - Make this work hardware agnostic as possible
 - Push as much as possible through gitlab 
 
-# Multiple compose-docker.<tool>.yml files
-Why - Each compose file allows to individually test each (docker-compose -f)
+#Layout
+$ tree
+.
+├── p1
+│   ├── Dockerfile
+│   └── docker-compose.yml
+└── p2
+    ├── Dockerfile
+    └── docker-compose.yml
+
+# Multiple folders
+Why - each secion is able to be tested individually, then called together (eg: docker-compose -f ~/funkySwarm/rocketChat/docker-compose.yml up -d)
 ### Current Tool List
-- Swarmpit
+- Portainer
 - Splunk
 - TheHive
 - rocket.chat 
@@ -25,3 +35,4 @@ Why - Each compose file allows to individually test each (docker-compose -f)
 - Full Packet Capture (TBD)
 - Zeek 
 - Ansible / AWX
+- traefik

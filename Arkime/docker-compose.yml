@@ -1,0 +1,8 @@
+version: '3'
+services: 
+  arkime:
+    build: .
+    ports:
+      - 8005:8005
+    # restart: unless-stopped
+    # volumes:
